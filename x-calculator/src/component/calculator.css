@@ -1,0 +1,40 @@
+.container{
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cal-cantainer{
+   
+    text-align: center;
+    
+    
+}
+.input-container{
+    height: 100%;
+    width: 100%;
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.ans-sum{
+    text-align: center;
+}
+.btn-container{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 10px;
+}
+
+.calBtn{
+    height: 50px;
+    width: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 2px solid black;
+}
