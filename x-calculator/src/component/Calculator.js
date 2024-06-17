@@ -64,55 +64,58 @@ const Calculator = () => {
     <div className="container">
       <div className="cal-container">
         <h1>React Calculator</h1>
-        <div className="input-container">
-          <input 
-            type="text" 
-            value={value} 
-            onChange={(e) => setValue(e.target.value)} 
-          />
-        </div>
-
-        <p className="ans-sum">{equal && value === ''?'Error':sumValue}</p>
-
-        <div className="btn-container">
-          {[
-            7,
-            8,
-            9,
-            "+",
-            4,
-            5,
-            6,
-            "-",
-            1,
-            2,
-            3,
-            "*",
-            "C",
-            0,
-            "=",
-            "/",
-          ].map((btnValue, index) => (
-            <input
-              key={index}
-              value={btnValue}
-              type="button"
-              className="calBtn"
-              onClick={(e) => {
-                if (btnValue === "C") {
-                  handleClearBtn();
-                } else if (btnValue === "=") {
-                  handleEqualBtn();
-                } else {
-                  setValue(value + e.target.value);
-                }
-              }}
+        <form onSubmit={(e) => e.preventDefault()}>
+          <div className="input-container">
+            <input 
+              type="text" 
+              value={value} 
+              onChange={(e) => setValue(e.target.value)} 
             />
-          ))}
-        </div>
+          </div>
+  
+          <p className="ans-sum">{equal && value === ''?'Error':sumValue}</p>
+  
+          <div className="btn-container">
+            {[
+              7,
+              8,
+              9,
+              "+",
+              4,
+              5,
+              6,
+              "-",
+              1,
+              2,
+              3,
+              "*",
+              "C",
+              0,
+              "=",
+              "/",
+            ].map((btnValue, index) => (
+              <input
+                key={index}
+                value={btnValue}
+                type="button"
+                className="calBtn"
+                onClick={(e) => {
+                  if (btnValue === "C") {
+                    handleClearBtn();
+                  } else if (btnValue === "=") {
+                    handleEqualBtn();
+                  } else {
+                    setValue(value + e.target.value);
+                  }
+                }}
+              />
+            ))}
+          </div>
+        </form>
+        
       </div>
     </div>
   );
-};
+}
 
 export default Calculator;
