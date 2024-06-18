@@ -129,94 +129,141 @@
 // export default Calculator;
 
 import React, { useState } from "react";
-import "./calculator.css";
 
+import './calculator.css'
 const Calculator = () => {
-  const [value, setValue] = useState("");
-  const [sumValue, setSumValue] = useState("");
-  const [equal, setEqual] = useState(false);
+  const [text, setText] = useState("");
+  const [output, setOutput] = useState(0);
 
-  const calculation = (input) => {
-    // Remove any leading zeros that are not part of a number
-    const cleanedInput = input.replace(/^0+(?=\d)/, '');
+  const calculate = (expression) => {
+    const operators = ["+", "-", "*", "/"];
+    const stack = [];
+    const output = [];
 
-    try {
-      // Evaluate the expression using eval() to handle basic calculations
-      // Note: eval() should be used carefully in production to avoid security risks
-      return eval(cleanedInput);
-    } catch (error) {
-      // Handle any errors (e.g., division by zero)
-      return "Error";
+    const getPrecedence = (operator) => {
+      switch (operator) {
+        case "+":
+        case "-":
+          return 1;
+        case "*":
+        case "/":
+          return 2;
+        default:
+          return 0;
+      }
+    };
+
+    for (let i = 0; i < expression.length; i++) {
+      const char = expression[i];
+
+      if (!isNaN(char) || char === ".") {
+        let number = char;
+        while (!isNaN(expression[i + 1]) || expression[i + 1] === ".") {
+          number += expression[++i];
+        }
+        output.push(parseFloat(number));
+      } else if (char === "(") {
+        stack.push(char);
+      } else if (char === ")") {
+        while (stack.length && stack[stack.length - 1] !== "(") {
+          output.push(stack.pop());
+        }
+        stack.pop();
+      } else if (operators.includes(char)) {
+        while (
+          stack.length &&
+          getPrecedence(char) <= getPrecedence(stack[stack.length - 1])
+        ) {
+          output.push(stack.pop());
+        }
+        stack.push(char);
+      }
     }
-  };
 
-  const handleClearBtn = () => {
-    setEqual(false);
-    setSumValue("");
-    setValue("");
-  };
-
-  const handleEqualBtn = () => {
-    setEqual(true);
-    setSumValue(calculation(value));
-  };
-
-  const handleButtonClick = (btnValue) => {
-    if (btnValue === "C") {
-      handleClearBtn();
-    } else if (btnValue === "=") {
-      handleEqualBtn();
-    } else {
-      setValue(value + btnValue);
-      setEqual(false);
+    while (stack.length) {
+      output.push(stack.pop());
     }
+
+    const resultStack = [];
+    output.forEach((token) => {
+      if (!isNaN(token)) {
+        resultStack.push(token);
+      } else {
+        const b = resultStack.pop();
+        const a = resultStack.pop();
+        switch (token) {
+          case "+":
+            resultStack.push(a + b);
+            break;
+          case "-":
+            resultStack.push(a - b);
+            break;
+          case "*":
+            resultStack.push(a * b);
+            break;
+          case "/":
+            resultStack.push(a / b);
+            break;
+          default:
+            break;
+        }
+      }
+    });
+
+    return resultStack.pop();
+  };
+
+  const handleInput = (char) => {
+    setText((prev) => prev + char);
+  };
+
+  const clearInput = () => {
+    setText("");
+    setOutput(0);
+  };
+
+  const equalsResult = () => {
+    if (text === "") {
+      setOutput("Error");
+      return;
+    } else if (text.includes("0/0")) {
+      setOutput(NaN);
+    } else if (text.includes("/0")) {
+      setOutput(Infinity);
+    }
+    setOutput(calculate(text));
   };
 
   return (
-    <div className="container">
-      <div className="cal-container">
-        <h1>React Calculator</h1>
-        <form onSubmit={(e) => e.preventDefault()}>
-          <div className="input-container">
-            <input
-              type="text"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-            />
-          </div>
-
-          {/* Display the calculation result or error message */}
-          <p className="ans-sum">{equal && value === "" ? "Error" : sumValue}</p>
-
-          <div className="btn-container">
-            {[
-              7,
-              8,
-              9,
-              "/",
-              4,
-              5,
-              6,
-              "*",
-              1,
-              2,
-              3,
-              "-",
-              "C",
-              0,
-              "=",
-              "+",
-            ].map((btnValue, index) => (
-              <input
-                key={index}
-                value={btnValue}
-                type="button"
-                className="calBtn"
-                onClick={() => handleButtonClick(btnValue)}
-              />
-            ))}
-          </div>
-        </form>
+    <div className="App">
+      <h1>React Calculator</h1>
+      <input type="text" value={text} readOnly />
+      <h3>Output: {output}</h3>
+      <div className="card">
+        <div>
+          <button onClick={() => handleInput("7")}>7</button>
+          <button onClick={() => handleInput("8")}>8</button>
+          <button onClick={() => handleInput("9")}>9</button>
+          <button onClick={() => handleInput("+")}>+</button>
+        </div>
+        <div>
+          <button onClick={() => handleInput("4")}>4</button>
+          <button onClick={() => handleInput("5")}>5</button>
+          <button onClick={() => handleInput("6")}>6</button>
+          <button onClick={() => handleInput("-")}>-</button>
+        </div>
+        <div>
+          <button onClick={() => handleInput("1")}>1</button>
+          <button onClick={() => handleInput("2")}>2</button>
+          <button onClick={() => handleInput("3")}>3</button>
+          <button onClick={() => handleInput("*")}>*</button>
+        </div>
+        <div>
+          <button onClick={clearInput}>C</button>
+          <button onClick={() => handleInput("0")}>0</button>
+          <button onClick={equalsResult}>=</button>
+          <button onClick={() => handleInput("/")}>/</button>
+        </div>
       </div>
     </div>
   );
